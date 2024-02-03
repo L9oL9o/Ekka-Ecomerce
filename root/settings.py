@@ -9,7 +9,13 @@ DEBUG = True
 
 ALLOWED_HOSTS = ['*']
 
+
+"""
+IN INSTALLED_APPS INSTALLED SOME ADMIN PANEL ('grappelli' 'jazzmin')
+TO USE JUST UNCOMMIT ONE OF THEM, NOT BOTH OF THEM IF YOU INSTALLED REQUIREMENTS.
+"""
 INSTALLED_APPS = [
+    # 'grappelli',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -19,6 +25,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'apps',
 ]
+
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -53,7 +60,7 @@ WSGI_APPLICATION = 'root.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': "django.db.backends.sqlite3",
-        'NAME':  BASE_DIR / "EKKA_DB.sqlite3",
+        'NAME': BASE_DIR / "EKKA_DB.sqlite3",
     }
 }
 
@@ -82,10 +89,9 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'static/')
+    BASE_DIR, 'static/'
 ]
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media/'
-
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
