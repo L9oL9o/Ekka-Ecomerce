@@ -10,3 +10,6 @@ git:
 	git add .
 	git commit
 	git push
+
+sur:
+	python manage.py createsuperuser
