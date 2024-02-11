@@ -8,5 +8,8 @@ rq:
 git:
 	git status
 	git add .
-	git commit
+	git commit -m
 	git push
+
+sur:
+	python manage.py createsuperuser
