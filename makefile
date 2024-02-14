@@ -13,3 +13,8 @@ git:
 
 sur:
 	python manage.py createsuperuser
+
+lang:
+	python manage.py makemessages -l uz
+	python manage.py makemessages -l ru
+	python manage.py makemessages -l en

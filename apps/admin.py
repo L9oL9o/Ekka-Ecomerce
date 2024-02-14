@@ -2,32 +2,31 @@ from django.contrib import admin
 from django.contrib.admin import TabularInline, ModelAdmin
 from apps.models import *
 
+admin.site.register([Discount, Currency])
+
 
 class ColorInline(TabularInline):
     model = Color
-    # fk_name = 'category'
 
 
 class PriceInline(TabularInline):
     model = Price
-#     fk_name = 'category'  # Specify the ForeignKey name
 
 
 class SizeInline(TabularInline):
     model = Size
-#     fk_name = 'category'
 
 
 class ProductImageInline(TabularInline):
     model = ProductImage
-#     fk_name = 'product'
 
 
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
     list_display = ['id', 'name', 'slug']
     list_display_links = ['id', 'name', 'slug']
-    prepopulated_fields = {'slug': ('name',)}
+    # prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ['slug',]
     inlines = [ColorInline, PriceInline, SizeInline]
     search_fields = ['name']
 
@@ -36,9 +35,10 @@ class CategoryAdmin(ModelAdmin):
 class ProductAdmin(ModelAdmin):
     list_display = ['id', 'name', 'slug', 'get_size_name', "get_price"]
     list_display_links = ['id', 'name', 'slug', 'get_size_name', "get_price"]
-    prepopulated_fields = {"slug": ('name',)}
+    # prepopulated_fields = {"slug": ('name',)}
+    readonly_fields = ["slug",]
     inlines = [PriceInline, ProductImageInline]
-    search_fields = ['name', 'category__title', 'prices__price']
+    search_fields = ['name', 'category__name', 'price__price']
     autocomplete_fields = ["category"]
 
     def get_size_name(self, obj):
@@ -59,20 +59,34 @@ class ProductAdmin(ModelAdmin):
 
     get_price.short_description = 'Price'
 
+    # HERE GPT SUGGESTED TO GET DISCOUNT PRICE
+    # def get_discounted_price(self, obj):
+    #     return obj.get_discounted_price()
+    #
+    # get_discounted_price.short_description = 'Discounted Price'
+
 
 @admin.register(Color)
 class ColorAdmin(ModelAdmin):
-    list_display = ['id', 'category', 'name', 'slug']
-    list_display_links = ['id', 'category', 'name', 'slug']
-    prepopulated_fields = {'slug': ('name',)}
+    list_display = ['id', 'category', "name", "color_choice"]
+    list_display_links = ['id', 'category', "name", "color_choice"]
+    prepopulated_fields = {'name': ('color_choice',)}
     search_fields = ['name']
+    readonly_fields = ["slug",]
+
+    def display_color(self, obj):
+        return '<div style="width: 30px; height: 30px; background-color: {};"></div>'.format(obj.color)
+
+    display_color.allow_tags = True
+    display_color.short_description = 'Color'
 
 
 @admin.register(Size)
 class SizeAdmin(ModelAdmin):
     list_display = ['id', 'name', 'slug']
     list_display_links = ['id', 'name', 'slug']
-    prepopulated_fields = {'slug': ('name',)}
+    # prepopulated_fields = {'slug': ('name',)}
+    readonly_fields = ["slug",]
     search_fields = ['name']
 
 
