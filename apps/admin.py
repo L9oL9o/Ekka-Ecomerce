@@ -2,7 +2,6 @@ from django.contrib import admin
 from django.contrib.admin import TabularInline, ModelAdmin
 from apps.models import *
 
-admin.site.register([Discount, Currency])
 
 
 class ColorInline(TabularInline):
@@ -33,8 +32,8 @@ class CategoryAdmin(ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
-    list_display = ['id', 'name', 'slug', 'get_size_name', "get_price"]
-    list_display_links = ['id', 'name', 'slug', 'get_size_name', "get_price"]
+    list_display = ['id', 'name',    'get_size_name', "get_price"]
+    list_display_links = ['id', 'name',  'get_size_name', "get_price"]
     # prepopulated_fields = {"slug": ('name',)}
     readonly_fields = ["slug",]
     inlines = [PriceInline, ProductImageInline]
@@ -108,3 +107,17 @@ class ProductImageAdmin(ModelAdmin):
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs
+
+
+@admin.register(Currency)
+class CurrencyAdmin(ModelAdmin):
+    list_display = ['id', "name", 'rate']
+    list_display_links = ['id', "name", 'rate']
+    readonly_fields = ["slug",]
+
+
+@admin.register(Discount)
+class CurrencyAdmin(ModelAdmin):
+    list_display = ['id', "name", 'text', "percentage", "count"]
+    list_display_links = ['id', "name", 'text', "percentage", "count"]
+    readonly_fields = ["slug",]
