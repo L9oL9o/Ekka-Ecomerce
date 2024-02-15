@@ -34,7 +34,9 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "apps"
+    # "apps",
+    "common",
+    "products"
 ]
 
 INSTALLED_APPS = THIRD_PARTY_APPS + INSTALLED_APPS + LOCAL_APPS
@@ -43,7 +45,9 @@ LOCALE_PATHS = [
     BASE_DIR / 'locale'
 ]
 
-LANGUAGE_CODE = [
+LANGUAGE_CODE = 'ru'
+
+LANGUAGES = [
     ("uz", "UZ"),
     ("ru", "RU"),
     ("en", "EN"),
@@ -114,7 +118,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-LANGUAGE_CODE = 'en-us'
+
 
 TIME_ZONE = 'UTC'
 

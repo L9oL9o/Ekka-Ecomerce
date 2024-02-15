@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.contrib.admin import TabularInline, ModelAdmin
-from apps.models import *
+from products.models import *
 
+
+# admin.site.register([, ])
 
 
 class ColorInline(TabularInline):
@@ -20,22 +22,29 @@ class ProductImageInline(TabularInline):
     model = ProductImage
 
 
+@admin.register(Catalog)
+class CatalogAdmin(ModelAdmin):
+    list_display = ('id', 'name')
+    list_display_links = ('id', 'name')
+    readonly_fields = ('slug',)
+    search_fields = ('name',)
+
+
 @admin.register(Category)
 class CategoryAdmin(ModelAdmin):
-    list_display = ['id', 'name', 'slug']
-    list_display_links = ['id', 'name', 'slug']
-    # prepopulated_fields = {'slug': ('name',)}
-    readonly_fields = ['slug',]
+    list_display = ['id', "catalog_id", 'name']
+    list_display_links = ['id', "catalog_id", 'name']
+    readonly_fields = ['slug', ]
     inlines = [ColorInline, PriceInline, SizeInline]
     search_fields = ['name']
 
 
 @admin.register(Product)
 class ProductAdmin(ModelAdmin):
-    list_display = ['id', 'name',    'get_size_name', "get_price"]
-    list_display_links = ['id', 'name',  'get_size_name', "get_price"]
+    list_display = ['id', 'name', 'slug', 'get_size_name', "get_price"]
+    list_display_links = ['id', 'name', 'slug', 'get_size_name', "get_price"]
     # prepopulated_fields = {"slug": ('name',)}
-    readonly_fields = ["slug",]
+    readonly_fields = ["slug", ]
     inlines = [PriceInline, ProductImageInline]
     search_fields = ['name', 'category__name', 'price__price']
     autocomplete_fields = ["category"]
@@ -69,23 +78,23 @@ class ProductAdmin(ModelAdmin):
 class ColorAdmin(ModelAdmin):
     list_display = ['id', 'category', "name", "color_choice"]
     list_display_links = ['id', 'category', "name", "color_choice"]
-    prepopulated_fields = {'name': ('color_choice',)}
+    # prepopulated_fields = {'name': ('color_choice',)}
     search_fields = ['name']
-    readonly_fields = ["slug",]
+    readonly_fields = ["slug", ]
 
-    def display_color(self, obj):
-        return '<div style="width: 30px; height: 30px; background-color: {};"></div>'.format(obj.color)
-
-    display_color.allow_tags = True
-    display_color.short_description = 'Color'
+    # def display_color(self, obj):
+    #     return '<div style="width: 30px; height: 30px; background-color: {};"></div>'.format(obj.color)
+    #
+    # display_color.allow_tags = True
+    # display_color.short_description = 'Color'
 
 
 @admin.register(Size)
 class SizeAdmin(ModelAdmin):
-    list_display = ['id', 'name', 'slug']
-    list_display_links = ['id', 'name', 'slug']
+    list_display = ['id', "category", 'name', 'slug']
+    list_display_links = ['id', "category", 'name', 'slug']
     # prepopulated_fields = {'slug': ('name',)}
-    readonly_fields = ["slug",]
+    readonly_fields = ["slug", ]
     search_fields = ['name']
 
 
@@ -99,25 +108,29 @@ class PriceAdmin(ModelAdmin):
     inlines = [ProductImageInline]
 
 
+@admin.register(Currency)
+class CurrencyAdmin(ModelAdmin):
+    list_display = ['id', 'name', 'rate', ]
+    list_display_links = ['id', 'name', 'rate', ]
+    readonly_fields = ["slug", ]
+    search_fields = ["name", ]
+    list_filter = ["name", ]
+
+
+@admin.register(Discount)
+class DiscountAdmin(ModelAdmin):
+    list_display = ['id', 'name', 'text', "percentage", "count"]
+    list_display_links = ['id', 'name', 'text', "percentage", "count"]
+    readonly_fields = ["slug", ]
+    search_fields = ["name", ]
+    list_filter = ["name", ]
+
+
 @admin.register(ProductImage)
 class ProductImageAdmin(ModelAdmin):
     list_display = ['id', 'product', 'image']
-    list_display_links = ['id', 'image']
+    list_display_links = ['id', 'product', 'image']
 
     def get_queryset(self, request):
         qs = super().get_queryset(request)
         return qs
-
-
-@admin.register(Currency)
-class CurrencyAdmin(ModelAdmin):
-    list_display = ['id', "name", 'rate']
-    list_display_links = ['id', "name", 'rate']
-    readonly_fields = ["slug",]
-
-
-@admin.register(Discount)
-class CurrencyAdmin(ModelAdmin):
-    list_display = ['id', "name", 'text', "percentage", "count"]
-    list_display_links = ['id', "name", 'text', "percentage", "count"]
-    readonly_fields = ["slug",]

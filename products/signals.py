@@ -1,7 +1,7 @@
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 
-from apps.models import Product
+from products.models import Product
 
 
 @receiver(post_save, sender=Product)

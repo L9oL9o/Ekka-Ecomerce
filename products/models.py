@@ -1,42 +1,41 @@
 import random
 import string
-
-import webcolors
+from common.models import BaseModel
 from colorfield.fields import ColorField
 from slugify import slugify
 from django.utils.translation import gettext_lazy as _
-from django.core.exceptions import ValidationError
-from django.db.models import Model, DateTimeField, URLField, CharField, IntegerField, SlugField, ForeignKey, TextField, \
-    CASCADE, PositiveIntegerField, DecimalField, ImageField, BooleanField, ManyToManyField
+from django.db.models import Model, CharField, SlugField, ForeignKey, TextField, CASCADE, PositiveIntegerField, \
+    DecimalField, ImageField, ManyToManyField
 
 
-class BaseModel(Model):
-    created_time = DateTimeField(auto_now_add=True)
-    updated_time = DateTimeField(auto_now=True)
-    is_active = BooleanField(default=True)
+class Catalog(BaseModel):
+    name = CharField(max_length=255, verbose_name=_('Name'))
+    slug = CharField(unique=True, max_length=255, verbose_name=_('Slug'))
 
-    def __str__(self):
-        return self.is_active
+    @staticmethod
+    def __generate_slug(slug):
+        data = string.ascii_letters
+        random_data = "".join([data[random.randint(0, len(data) - 1)] for i in range(20)])
+        random_int = random.randint(10000, 9999999)
+        done_slug = "-".join(str(random_int)) + "/" + "-".join(slug) + "/" + "-".join(random_data)
+        return done_slug
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.name)
+        self.slug = self.__generate_slug(self.slug)
+        super(Catalog, self).save(*args, **kwargs)
 
     class Meta:
-        abstract = True
-
-
-class Common(BaseModel):
-    facebook = URLField(verbose_name="Facebook")
-    twitter = URLField(verbose_name="Twitter")
-    instagram = URLField(verbose_name="Instagram")
-    linkedin = URLField(verbose_name="LinkedIN")
-    youtube = URLField(verbose_name="Youtube")
-    whatsapp = URLField(verbose_name="Whatsapp")
+        verbose_name_plural = "Catalog"
 
     def __str__(self):
-        return [self.facebook, self.twitter, self.instagram, self.linkedin, self.youtube, self.whatsapp]
+        return f"{self.name}  "
 
 
 class Category(BaseModel):
-    name = CharField(max_length=255, verbose_name=_('Name'))
-    slug = SlugField(unique=True, verbose_name='Slug')
+    catalog_id = ForeignKey("products.Catalog", verbose_name=_('Catalog'), on_delete=CASCADE, related_name='categories')
+    name = CharField(max_length=255, verbose_name=_('Category Name'))
+    slug = SlugField(max_length=255, unique=True, verbose_name=_('Slug'))
 
     @staticmethod
     def __generate_slug(slug):
@@ -51,15 +50,18 @@ class Category(BaseModel):
         self.slug = self.__generate_slug(self.slug)
         super(Category, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name_plural = "Category"
+
     def __str__(self):
         return self.name
 
 
 class Color(BaseModel):
-    category = ForeignKey("apps.Category", on_delete=CASCADE, related_name='color')
-    name = CharField(max_length=255, verbose_name=" Name")
-    color_choice = ColorField(default='#FF0000', format="hexa", verbose_name="Color")
-    slug = SlugField(max_length=255, unique=False, verbose_name='Slug')
+    category = ForeignKey("products.Category", on_delete=CASCADE, related_name='color')
+    name = CharField(max_length=255, verbose_name=_("Name"))
+    color_choice = ColorField(verbose_name=_("Color"))
+    slug = SlugField(max_length=255, unique=True, verbose_name=_('Slug'))
 
     @staticmethod
     def __generate_slug(slug):
@@ -70,21 +72,21 @@ class Color(BaseModel):
         return done_slug
 
     def save(self, *args, **kwargs):
-        if self.name is None:
-            self.slug = slugify(self.color_choice)
-        else:
-            self.slug = slugify(self.name)
+        self.slug = slugify(self.color_choice)
         self.slug = self.__generate_slug(self.slug)
         super(Color, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = "Color"
 
     def __str__(self):
         return self.name
 
 
 class Size(BaseModel):
-    category = ForeignKey("apps.Category", on_delete=CASCADE, related_name='sizes')
-    name = CharField(max_length=255, verbose_name="Name")
-    slug = SlugField(max_length=255, unique=True, verbose_name="Slug")
+    category = ForeignKey("products.Category", on_delete=CASCADE, related_name='sizes')
+    name = CharField(max_length=255, verbose_name=_("Name"))
+    slug = SlugField(max_length=255, unique=True, verbose_name=_("Slug"))
 
     @staticmethod
     def __generate_slug(slug):
@@ -99,19 +101,23 @@ class Size(BaseModel):
         self.slug = self.__generate_slug(self.slug)
         super(Size, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name_plural = "Size"
+
     def __str__(self):
         return self.name
 
 
 class Product(BaseModel):
-    category = ForeignKey("apps.Category", on_delete=CASCADE, related_name='products', verbose_name='Category')
-    name = CharField(max_length=255, verbose_name="Title")
-    slug = SlugField(max_length=255, unique=True, verbose_name='Slug')
-    text = TextField(verbose_name="Text")
-    discount_id = ForeignKey('apps.Discount', on_delete=CASCADE, related_name='products', verbose_name="Discount",
+    category = ForeignKey("products.Category", on_delete=CASCADE, related_name='products', verbose_name=_('Category'))
+    name = CharField(max_length=255, verbose_name=_("Title"))
+    slug = SlugField(max_length=255, unique=True, verbose_name=_('Slug'))
+    text = TextField(verbose_name=_("Text"))
+    discount_id = ForeignKey('products.Discount', on_delete=CASCADE, related_name='products',
+                             verbose_name=_("Discount"),
                              null=True, blank=True)
 
-    currency_ids = ManyToManyField('apps.Currency', related_name='products')
+    currency_ids = ManyToManyField('products.Currency', related_name='products')
 
     # def clean(self):
     #     if len(self.text) < 50:
@@ -132,39 +138,34 @@ class Product(BaseModel):
         self.slug = self.__generate_slug(self.slug)
         super(Product, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name_plural = "Product"
+
     def __str__(self):
         return self.name
 
-    # HERE GPT SUGGESTED TO GET DISCOUNT PRICE
-    # def get_discounted_price(self):
-    #     # Check if the product has a discount associated with it
-    #     if self.discount:
-    #         # Calculate the discounted price based on the discount percentage
-    #         discounted_price = (self.price / 100) * (100 - self.discount.discount)
-    #         return discounted_price
-    #     else:
-    #         # If there is no discount, return the regular price
-    #         return self.price
-
 
 class Price(BaseModel):
-    product = ForeignKey("apps.Product", on_delete=CASCADE, related_name='prices', verbose_name="Product")
-    category = ForeignKey("apps.Category", on_delete=CASCADE, related_name='prices', verbose_name="Category")
-    color = ForeignKey("apps.Color", on_delete=CASCADE, related_name='prices', verbose_name="Color")
-    size = ForeignKey("apps.Size", on_delete=CASCADE, related_name='prices', verbose_name="Size")
-    price = DecimalField(max_digits=10, decimal_places=2, verbose_name="Price")
-    count = PositiveIntegerField(default=0, verbose_name="  Count")
+    product = ForeignKey("products.Product", on_delete=CASCADE, related_name='prices', verbose_name=_("Product"))
+    category = ForeignKey("products.Category", on_delete=CASCADE, related_name='prices', verbose_name=_("Category"))
+    color = ForeignKey("products.Color", on_delete=CASCADE, related_name='prices', verbose_name=_("Color"))
+    size = ForeignKey("products.Size", on_delete=CASCADE, related_name='prices', verbose_name=_("Size"))
+    price = DecimalField(max_digits=10, decimal_places=2, verbose_name=_("Price"))
+    count = PositiveIntegerField(default=0, verbose_name=_("  Count"))
+
+    class Meta:
+        verbose_name_plural = "Price"
 
     def __str__(self):
         return f"{self.product.name} {self.size.name} {self.color.name}"
 
 
 class Discount(BaseModel):
-    name = CharField(max_length=255, verbose_name=" Name")
-    slug = SlugField(max_length=255, verbose_name="Slug")
-    text = TextField(max_length=255, verbose_name="Text")
-    percentage = PositiveIntegerField(default=0, verbose_name="Percentage")
-    count = PositiveIntegerField(default=10, verbose_name="Count")
+    name = CharField(max_length=255, verbose_name=_(" Name"))
+    slug = SlugField(max_length=255, verbose_name=_("Slug"))
+    text = TextField(max_length=255, verbose_name=_("Text"))
+    percentage = PositiveIntegerField(default=0, verbose_name=_("Percentage"))
+    count = PositiveIntegerField(default=10, verbose_name=_("Count"))
 
     @staticmethod
     def __generate_slug(slug):
@@ -179,22 +180,28 @@ class Discount(BaseModel):
         self.slug = self.__generate_slug(self.slug)
         super(Discount, self).save(*args, **kwargs)
 
+    class Meta:
+        verbose_name_plural = "Discount"
+
     def __str__(self):
         return self.name
 
 
 class ProductImage(BaseModel):
-    product = ForeignKey("apps.Product", on_delete=CASCADE, related_name='images', verbose_name='Product')
-    price = ForeignKey("apps.Price", on_delete=CASCADE, related_name='images', verbose_name='Price')
-    image = ImageField(upload_to='product_images/', verbose_name='Image')
+    product = ForeignKey("products.Product", on_delete=CASCADE, related_name='images', verbose_name=_('Product'))
+    price = ForeignKey("products.Price", on_delete=CASCADE, related_name='images', verbose_name=_('Price'))
+    image = ImageField(upload_to='product_images/', verbose_name=_('Image'))
+
+    class Meta:
+        verbose_name_plural = "Product Image"
 
     def __str__(self):
         return self.product.name
 
 
 class Currency(BaseModel):
-    name = CharField(max_length=255, verbose_name="Name of Currency")
-    slug = SlugField(max_length=255, unique=True, verbose_name="Slug")
+    name = CharField(max_length=255, verbose_name=_("Currency Name"))
+    slug = SlugField(max_length=255, unique=True, verbose_name=_("Slug"))
     rate = DecimalField(max_digits=10, decimal_places=2)
 
     @staticmethod
@@ -209,6 +216,9 @@ class Currency(BaseModel):
         self.slug = slugify(self.name)
         self.slug = self.__generate_slug(self.slug)
         super(Currency, self).save(*args, **kwargs)
+
+    class Meta:
+        verbose_name_plural = "Currency"
 
     def __str__(self):
         return self.name

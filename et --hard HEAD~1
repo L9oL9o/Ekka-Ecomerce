@@ -1,0 +1,35 @@
+[33mcommit 5c41fa282b5394b3b54eb7c7e37b56675f40269b[m[33m ([m[1;36mHEAD -> [m[1;32mL9o[m[33m, [m[1;31morigin/L9o[m[33m)[m
+Author: l9o <ertye9020@gmail.com>
+Date:   Wed Feb 14 17:56:53 2024 +0500
+
+    Feat: updated admin.py
+
+[33mcommit 9749d70a52035f7625e1f940fece9801f4ac0fb5[m
+Author: l9o <ertye9020@gmail.com>
+Date:   Wed Feb 14 17:32:07 2024 +0500
+
+    Feat: updated models, admin panel, started doing template, multilanguage, multicurrency parts
+
+[33mcommit 12290a0560885d57ef30200e1c38a9d9a7adc6e0[m
+Author: l9o <ertye9020@gmail.com>
+Date:   Sun Feb 11 22:31:11 2024 +0500
+
+    feat: improved models, admin pannel. Project on runnable status.
+
+[33mcommit 88e891bcf6c0adbc7fd9073933062fbd7b6e1eb2[m
+Author: l9o <ertye9020@gmail.com>
+Date:   Wed Feb 7 17:31:09 2024 +0500
+
+    Project on runnable status, Feat: updated models, admin panell.
+
+[33mcommit b607f07477107042590cf4447140764fee4d8472[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m
+Author: l9o <ertye9020@gmail.com>
+Date:   Sat Feb 3 15:42:05 2024 +0500
+
+    Feat: Created & Updated: Models, Admin panell, DB.
+
+[33mcommit 4bf14f230811396f99eb6ea7c3974c7c3d41efff[m
+Author: l9o <ertye9020@gmail.com>
+Date:   Fri Feb 2 18:32:14 2024 +0500
+
+    Initial commit.
