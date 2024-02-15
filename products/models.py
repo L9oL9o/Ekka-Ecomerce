@@ -191,6 +191,7 @@ class ProductImage(BaseModel):
     product = ForeignKey("products.Product", on_delete=CASCADE, related_name='images', verbose_name=_('Product'))
     price = ForeignKey("products.Price", on_delete=CASCADE, related_name='images', verbose_name=_('Price'))
     image = ImageField(upload_to='product_images/', verbose_name=_('Image'))
+    # qwe
 
     class Meta:
         verbose_name_plural = "Product Image"
